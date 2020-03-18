@@ -1,0 +1,62 @@
+#!/usr/bin/env joker
+(use 'joker.os)
+
+(def delimiters #{\( \[ \{ \} \] \)})
+(def openers #{\( \[ \{})
+(def closers #{\) \] \}})
+
+(def lines-in
+  ;; All lines from stdin, as an array of strings
+  (->> (repeatedly read-line)
+       (take-while #(not= nil %))))
+
+(defn index-chars [indexed-line]
+  ;; Takes a list [int string]
+  ;; Returns a list of vectors [int int string]
+  (let [li (first indexed-line)
+        chars (last indexed-line)]
+    (map-indexed (fn [ci ch] [li ci ch]) chars)))
+
+(def char-list
+  (->> lines-in
+       (map-indexed (fn [i ln] [i ln]))
+       (mapcat index-chars)))
+
+(def parens-list
+  (filter #(contains? delimiters (last %)) char-list))
+
+(def nest-list
+  (:result
+    (reduce
+      (fn
+        [state up-next]
+        (if (contains? openers (last up-next))
+          ;; If up-next is an opener
+          {:result
+             (conj (:result state)
+                   {:line (+ (first up-next) 1)
+                    :column (+ (second up-next) 1)
+                    :level (mod (:level state) 5)})
+           :level (inc (:level state))}
+          ;; If up-next is a closer
+          {:result
+             (conj (:result state)
+                   {:line (+ (first up-next) 1)
+                    :column (+ (second up-next) 1)
+                    :level (mod (dec (:level state)) 5)})
+           :level (dec (:level state))}))
+      {:result []
+       :level 0}
+      parens-list)))
+
+(defn to-range [x]
+  (str "'" (:line x) "." (:column x) "+1|leprekoune" (:level x) "' "))
+
+(def ranges (apply str (map to-range nest-list)))
+
+(println
+ (str "eval -client "
+       (get-env "kak_client")
+      " \"set-option window leprekoune "
+       (get-env "kak_timestamp")
+      " " ranges "\""))
