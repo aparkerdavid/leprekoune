@@ -1,3 +1,3 @@
-A fast rainbow-parens plugin for Kakoune.
+A fast rainbow-parens plugin for [Kakoune](https://github.com/mawww/kakoune).
 
-Requires joker installed and on your PATH.
+Requires [joker](https://github.com/candid82/joker) installed and on your PATH.
