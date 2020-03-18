@@ -1,10 +1,10 @@
 declare-option range-specs leprekoune
 
-face global leprekoune0 bright-red
-face global leprekoune1 bright-blue
-face global leprekoune2 yellow
-face global leprekoune3 bright-magenta
-face global leprekoune4 bright-cyan
+face global leprekoune0 blue
+face global leprekoune1 green
+face global leprekoune2 magenta
+face global leprekoune3 bright-yellow
+face global leprekoune4 cyan
 
 define-command leprekoune %{
 
